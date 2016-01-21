@@ -17,10 +17,12 @@ C-------------------------------------------------------------------------------
       subroutine RotMatrix(Vmat,debug)
       implicit none
       logical debug             ! If is .true. use debuguin part
-      double complex V(4,2,3,3) 
-      integer P,I,i,j
+      double complex VuL(3,3),VuR(3,3),VdL(3,3),VdR(3,3),VnL(3,3)
+      double complex VnR(3,3),VeL(3,3),VeR(3,3)
+      double complex Vmat(4,2,3,3)
+      integer P,II,i,j
 
-      include 'common.f'
+C      include 'common.f'
 C      include 'commondelta'
 
 C     Import the values of the rotation matrix
@@ -32,85 +34,65 @@ C     I: Chirality; 1:Left, 2:Right
 C     i,j: Flavor or Families; 1:electron, 2:muon, 3:Tau
       
       do 100, P=1, 4            !Fermion type
-         do 200, I=1, 2         !Chirality
-            do 300, i=1, 3      !Family
-               do 400, j=1, 3   !Family
-
-                  if (P .eq. 1) then
-
-                     if (I .eq. 1) then
-
-                        Vmat(P,I,i,j)= VuL(i,j)
-                        
-                     else if (I .eq. 2) then
-
-                        Vmat(P,I,i,j)= VuR(i,j)
-                        
-                     else
-
-                        STOP 'errVmat'
-                        
-                     end if     !end I if
-
-                     
-                  else if (p .eq. 2) then
-
-                     if (I .eq. 1) then
-
-                        Vmat(P,I,i,j)= VdL(i,j)
-                        
-                     else if (I .eq. 2) then
-
-                        Vmat(P,I,i,j)= VdR(i,j)
-                        
-                     else
-
-                        STOP 'errVmat'
-                        
-                     end if     !end I if
-                     
-                  else if (P .eq. 3) then
-                     
-                     if (I .eq. 1) then
-
-                        Vmat(P,I,i,j)= VnL(i,j)
-                        
-                     else if (I .eq. 2) then
-
-                        Vmat(P,I,i,j)= VnR(i,j)
-                        
-                     else
-
-                        STOP 'errVmat'
-                        
-                     end if     !end I if
-                     
-                  else if (P .eq. 4) then
-
-                     if (I .eq. 1) then
-
-                        Vmat(P,I,i,j)= VeL(i,j)
-                        
-                     else if (I .eq. 2) then
-
-                        Vmat(P,I,i,j)= VeR(i,j)
-                        
-                     else
-
-                        STOP 'errVmat'
-                        
-                     end if     !end I if
-                     
-                  else
-
-                     STOP 'errVmat'
-                     
-                  end if        !end P if
-                     
-
-               
- 300        continue
-            
+         do 200, II=1, 2        !Chirality
+            if (P.eq.1) then
+               if (II.eq.1) then
+                  Vmat(P,II,i,j)= VuL(i,j)
+               else if (II.eq.2) then
+                  Vmat(P,II,i,j)= VuR(i,j)
+               else
+                  STOP 'errVmat'
+               end if           !end I if
+            else if (p.eq.2) then
+               if (II.eq.1) then
+                  Vmat(P,II,i,j)= VdL(i,j)
+               else if (II.eq.2) then
+                  Vmat(P,II,i,j)= VdR(i,j)
+               else
+                  STOP 'errVmat'
+               end if           !end I if
+            else if (P.eq.3) then
+               if (II.eq.1) then
+                  Vmat(P,II,i,j)= VnL(i,j)
+               else if (II.eq.2) then
+                  Vmat(P,II,i,j)= VnR(i,j)
+               else
+                  STOP 'errVmat'
+               end if           !end I if
+            else if (P .eq. 4) then
+               if (II.eq.1) then
+                  Vmat(P,II,i,j)= VeL(i,j)
+               else if (II.eq.2) then
+                  Vmat(P,II,i,j)= VeR(i,j)
+               else
+                  STOP 'errVmat'
+               end if           !end I if
+            else
+               STOP 'errVmat'
+            end if              !end P if
  200     continue
-         
  100  continue
+      
+         
+C***********************************DEBUGGING***********************************C   
+         
+         if (debug) then
+            open (unit=10,file='RotMatrix.out',status='new')
+            
+            do 400, p=1, 4
+               do 500, II=1, 2
+                  do 600, i=1, 3
+                     do 700, j=1, 3
+                        write(10,*) "Vmat(",P,II,i,j,")=",Vmat(P,II,i,j)            
+ 700                 continue
+ 600              continue
+ 500           continue
+ 400        continue
+
+         
+         
+      end if                    !End debugguing if
+      close(unit=10)
+
+      return
+      end                       !End subroutine RotMatrix
