@@ -18,11 +18,10 @@ C-------------------------------------------------------------------------------
       implicit none
       logical debug             ! If is .true. use debuguin part
       double complex VuL(3,3),VuR(3,3),VdL(3,3),VdR(3,3),VnL(3,3)
-      double complex VnR(3,3),VeL(3,3),VeR(3,3)
+      double complex VnR(3,3),VeL(3,3),VeR(3,3) !Deben de ir en comondelta      #
       double complex Vmat(4,2,3,3)
       integer P,II,i,j
 
-C      include 'common.f'
 C      include 'commondelta'
 
 C     Import the values of the rotation matrix
@@ -35,41 +34,45 @@ C     i,j: Flavor or Families; 1:electron, 2:muon, 3:Tau
       
       do 100, P=1, 4            !Fermion type
          do 200, II=1, 2        !Chirality
-            if (P.eq.1) then
-               if (II.eq.1) then
-                  Vmat(P,II,i,j)= VuL(i,j)
-               else if (II.eq.2) then
-                  Vmat(P,II,i,j)= VuR(i,j)
-               else
-                  STOP 'errVmat'
-               end if           !end I if
-            else if (p.eq.2) then
-               if (II.eq.1) then
-                  Vmat(P,II,i,j)= VdL(i,j)
-               else if (II.eq.2) then
-                  Vmat(P,II,i,j)= VdR(i,j)
-               else
-                  STOP 'errVmat'
-               end if           !end I if
-            else if (P.eq.3) then
-               if (II.eq.1) then
-                  Vmat(P,II,i,j)= VnL(i,j)
-               else if (II.eq.2) then
-                  Vmat(P,II,i,j)= VnR(i,j)
-               else
-                  STOP 'errVmat'
-               end if           !end I if
-            else if (P .eq. 4) then
-               if (II.eq.1) then
-                  Vmat(P,II,i,j)= VeL(i,j)
-               else if (II.eq.2) then
-                  Vmat(P,II,i,j)= VeR(i,j)
-               else
-                  STOP 'errVmat'
-               end if           !end I if
-            else
-               STOP 'errVmat'
-            end if              !end P if
+            do 300, i=1, 3
+               do 400, j=1,3
+                  if (P.eq.1) then
+                     if (II.eq.1) then
+                        Vmat(P,II,i,j)= VuL(i,j)
+                     else if (II.eq.2) then
+                        Vmat(P,II,i,j)= VuR(i,j)
+                     else
+                        STOP 'errVmat'
+                     end if     !end I if
+                  else if (p.eq.2) then
+                     if (II.eq.1) then
+                        Vmat(P,II,i,j)= VdL(i,j)
+                     else if (II.eq.2) then
+                        Vmat(P,II,i,j)= VdR(i,j)
+                     else
+                        STOP 'errVmat'
+                     end if     !end I if
+                  else if (P.eq.3) then
+                     if (II.eq.1) then
+                        Vmat(P,II,i,j)= VnL(i,j)
+                     else if (II.eq.2) then
+                        Vmat(P,II,i,j)= VnR(i,j)
+                     else
+                        STOP 'errVmat'
+                     end if     !end I if
+                  else if (P .eq. 4) then
+                     if (II.eq.1) then
+                        Vmat(P,II,i,j)= VeL(i,j)
+                     else if (II.eq.2) then
+                        Vmat(P,II,i,j)= VeR(i,j)
+                     else
+                        STOP 'errVmat'
+                     end if     !end I if
+                  else
+                     STOP 'errVmat'
+                  end if        !end P if
+ 400           continue
+ 300        continue
  200     continue
  100  continue
       
@@ -79,15 +82,15 @@ C***********************************DEBUGGING***********************************
          if (debug) then
             open (unit=10,file='RotMatrix.out',status='new')
             
-            do 400, p=1, 4
-               do 500, II=1, 2
-                  do 600, i=1, 3
-                     do 700, j=1, 3
+            do 500, p=1, 4
+               do 600, II=1, 2
+                  do 700, i=1, 3
+                     do 800, j=1, 3
                         write(10,*) "Vmat(",P,II,i,j,")=",Vmat(P,II,i,j)            
- 700                 continue
- 600              continue
- 500           continue
- 400        continue
+ 800                 continue
+ 700              continue
+ 600           continue
+ 500        continue
 
          
          
@@ -96,3 +99,229 @@ C***********************************DEBUGGING***********************************
 
       return
       end                       !End subroutine RotMatrix
+
+C********************************************************************************C
+
+
+      
+C--------------------------------------------------------------------------------C 
+C                                                                                C 
+C   Subrutine Epsilon(epsi,debug), call zprime and organize on a estructure      C 
+C                                                                                C 
+C--------------------------------------------------------------------------------C
+
+
+      subroutine Epsilon(epsi,debug)
+      implicit none
+      logical debug             ! If is .true. use debuguin part
+      double complex epsi(4,2,3)
+      integer P,II,i,j
+      double precision xval(27)
+      
+      include 'common.f'
+C      include 'commondelta'
+
+C     Import the coupling values of Z' to fermions
+      call zprimecoup(xval,27)  
+
+      do 100, P=1, 4
+         do 200, II=1, 2
+            do 300, i=1, 3
+               if (P.eq.1) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi(P,II,i) = eps2_L(4) !UP Left
+                     else if (i.eq.2) then
+                        epsi(P,II,i) = eps2_L(5) !Charm Left
+                     else if (i.eq.3) then
+                        epsi(P,II,i) = eps2_L(6) !Top Left
+                     else
+                        STOP 'errEps'
+                     end if
+                  else if (II.eq.2) then
+                     if (i.eq.1) then
+                        epsi(P,II,i) = eps2_R(4) !UP Right
+                     else if (i.eq.2) then
+                        epsi(P,II,i) = eps2_R(5) !Charm Right
+                     else if (i.eq.3) then
+                        epsi(P,II,i) = eps2_R(6) !Top Right
+                     else
+                        STOP 'errEps'
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else if (P.eq.2) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi(P,II,i) = eps2_L(7) !Down Left
+                     else if (i.eq.2) then           
+                        epsi(P,II,i) = eps2_L(8) !Strange Left
+                     else if (i.eq.3) then           
+                        epsi(P,II,i) = eps2_L(9) !Bottom Left
+                     else                            
+                        STOP 'errEps'      
+                     end if                          
+                  else if (II.eq.2) then             
+                     if (i.eq.1) then                
+                        epsi(P,II,i) = eps2_R(7) !Down Right
+                     else if (i.eq.2) then           
+                        epsi(P,II,i) = eps2_R(8) !Strange Right
+                     else if (i.eq.3) then           
+                        epsi(P,II,i) = eps2_R(9) !Bottom Right
+                     else                            
+                        STOP 'errEps'      
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else if (P.eq.3) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi(P,II,i) = eps2_L(0)  !Neutrino e- Left
+                     else if (i.eq.2) then           
+                        epsi(P,II,i) = eps2_L(-1) !Neutrino M Left
+                     else if (i.eq.3) then           
+                        epsi(P,II,i) = eps2_L(-2) !Neutrino T Left
+                     else                            
+                        STOP 'errEps'      
+                     end if                          
+                  else if (II.eq.2) then             
+                     if (i.eq.1) then                
+                        epsi(P,II,i) = eps2_R(0)  !Neutrino e- Right
+                     else if (i.eq.2) then           
+                        epsi(P,II,i) = eps2_R(-1) !Neutrino M Right
+                     else if (i.eq.3) then           
+                        epsi(P,II,i) = eps2_R(-2) !Neutrino T Right
+                     else                            
+                        STOP 'errEps'      
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else if (P.eq.4) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi(P,II,i) = eps2_L(1)  ! e- Left
+                     else if (i.eq.2) then           
+                        epsi(P,II,i) = eps2_L(2) ! Mu Left
+                     else if (i.eq.3) then           
+                        epsi(P,II,i) = eps2_L(3) ! Tau Left
+                     else                            
+                        STOP 'errEps'      
+                     end if                          
+                  else if (II.eq.2) then             
+                     if (i.eq.1) then                
+                        epsi(P,II,i) = eps2_R(1)  ! e- Right
+                     else if (i.eq.2) then           
+                        epsi(P,II,i) = eps2_R(2) ! Mu Right
+                     else if (i.eq.3) then           
+                        epsi(P,II,i) = eps2_R(3) !Tau Right
+                     else                             
+                        STOP 'errEps'       
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else
+                  STOP 'errEps'   
+               end if
+ 300        continue
+ 200     continue
+ 100  continue
+
+
+
+
+C***********************************DEBUGGING***********************************C   
+         
+      if (debug) then
+         open (unit=11,file='Epsilon.out',status='new')
+
+         do 400, P=1, 4
+            do 500, II=1, 2
+               do 600, i=1, 3
+                  write(11,*) "epsi(",P,II,i,")=",epsi(P,II,i)  
+ 600           continue
+ 500        continue
+ 400     continue
+                  
+      end if                    !End debugguing if
+      close(unit=11)
+      
+      return
+      end                       !End subroutine RotMatrix
+
+C********************************************************************************C
+
+
+      
+C--------------------------------------------------------------------------------C 
+C                                                                                C 
+C   Subrutine VPV() Calculate the product VPV^t    C 
+C                                                                                C 
+C--------------------------------------------------------------------------------C
+
+
+
+      
+
+
+C***********************************DEBUGGING***********************************C   
+         
+      if (debug) then
+         open (unit=12,file='.out',status='new')
+
+         do 400, P=1, 4
+            do 500, II=1, 2
+               do 600, i=1, 3
+                  write(11,*) "VPV(",P,II,i,j,")=",epsi(P,II,i)  
+ 600           continue
+ 500        continue
+ 400     continue
+                  
+      end if                    !End debugguing if
+      close(unit=11)
+      
+      return
+      end                       !End subroutine RotMatrix
+
+C********************************************************************************C
+
+
+
+
+
+
+      
+CC--------------------------------------------------------------------------------C 
+CC                                                                                C 
+CC   Subrutine     C 
+CC                                                                                C 
+CC--------------------------------------------------------------------------------C
+C 
+C 
+C 
+C 
+CC***********************************DEBUGGING***********************************C  
+C         
+C      if (debug) then
+C         open (unit=12,file='.out',status='new')
+C 
+C         do 400, P=1, 4
+C            do 500, II=1, 2
+C               do 600, i=1, 3
+C                  write(11,*) "epsi(",P,II,i,")=",epsi(P,II,i)  
+C 600           continue
+C 500        continue
+C 400     continue
+C                  
+C      end if                    !End debugguing if
+C      close(unit=11)
+C      
+C      return
+C      end                       !End subroutine RotMatrix
+C 
+CC********************************************************************************C
+
+      
