@@ -323,7 +323,7 @@ C*******************************************************************************
       
 C--------------------------------------------------------------------------------C 
 C                                                                                C 
-C   Subrutine Delt(epsi,debug)    C 
+C                         Subrutine Delt(epsi,debug)                             C 
 C                                                                                C 
 C--------------------------------------------------------------------------------C
  
@@ -372,11 +372,112 @@ C     #: number of spaces; I:integer; D: doubles; F
       close(unit=13)
       
       return
-      end                       !End subroutine RotMatrix
+      end                       !End subroutine Delt
  
 C********************************************************************************C
 
       
+      
+C--------------------------------------------------------------------------------C 
+C                                                                                C 
+C                           Subrutine DBDG                                       C 
+C                                                                                C 
+C--------------------------------------------------------------------------------C
+ 
+      subroutine DBDG(DB,DG,debug)
+      implicit none
+      double complex VPV(3,4,2,3,3), Del(3,3,4,2)
+      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
+      integer P,II,B,a,i,j
+      logical debug             ! If is .true. use debuguin part
+
+
+      call VPVt(VPV,debug)
+      call Delt(Del,debug)
+
+
+      do 100, B=1, 3
+         do 200, a=1, 3
+            do 300, P=1, 4
+               do 400, II=1, 2
+                  do 500, i=1, 3
+                     do 600, j=1, 3
+                        DB(B,a,P,II,i,j)= Del(B,a,P,II)*VPV(B,P,II,i,j)
+ 600                 continue
+ 500              continue
+ 400           continue
+ 300        continue
+ 200     continue
+ 100  continue
+
+C     1: Vectorial, 2: Axial
+
+      do 110, B=1, 3
+         do 210, a=1, 3
+            do 310, P=1, 4
+               do 510, i=1, 3
+                  do 610, j=1, 3
+                     DG(B,a,P,1,i,j)=DB(B,a,P,1,i,j)+DB(B,a,P,2,i,j)
+                     DG(B,a,P,2,i,j)=DB(B,a,P,1,i,j)-DB(B,a,P,2,i,j)
+ 610              continue
+ 510           continue
+ 310        continue
+ 210     continue
+ 110  continue
+ 
+
+      
+ 
+C***********************************DEBUGGING***********************************C  
+         
+      if (debug) then
+         open (unit=14,file='DBDG.out',status='new')
+
+ 2000    format('',A3,6I2,A2,2E15.7)
+         
+
+         
+      do 101, B=1, 3
+         do 201, a=1, 3
+            do 301, P=1, 4
+               do 401, II=1, 2
+                  do 501, i=1, 3
+                     do 601, j=1, 3
+                        write(14,2000) "DB(",B,a,P,II,i,j,")=",
+     .                       DB(B,a,P,II,i,j)
+ 601                 continue
+ 501              continue
+ 401           continue
+ 301        continue
+ 201     continue
+ 101  continue
+
+      write(14,*)"-------------------------------------------"
+      
+      do 111, B=1, 3
+         do 211, a=1, 3
+            do 311, P=1, 4
+               do 411, II=1, 2
+                  do 511, i=1, 3
+                     do 611, j=1, 3
+                        write(14,2000) "DG(",B,a,P,II,i,j,")=",
+     .                       DG(B,a,P,II,i,j)
+ 611                 continue
+ 511              continue
+ 411           continue
+ 311        continue
+ 211     continue
+ 111  continue
+
+      
+      end if                    !End debugguing if
+      close(unit=14)
+      
+      return
+      end                       !End subroutine RotMatrix
+ 
+C********************************************************************************C
+
       
 CC--------------------------------------------------------------------------------C 
 CC                                                                                C 
@@ -391,11 +492,11 @@ CC***********************************DEBUGGING**********************************
 C         
 C      if (debug) then
 C         open (unit=12,file='.out',status='new')
-C 
+C2000    format('',A4,5I2,A2,2E15.7) 
 C         do 400, P=1, 4
 C            do 500, II=1, 2
 C               do 600, i=1, 3
-C                  write(11,*) "epsi(",P,II,i,")=",epsi(P,II,i)  
+C                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
 C 600           continue
 C 500        continue
 C 400     continue
@@ -407,5 +508,3 @@ C      return
 C      end                       !End subroutine RotMatrix
 C 
 CC********************************************************************************C
-
-      

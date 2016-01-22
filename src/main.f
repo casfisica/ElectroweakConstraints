@@ -5,6 +5,7 @@
       double complex Vmat(4,2,3,3),VPV(3,4,2,3,3), Del(3,3,4,2)
       double complex VuL(3,3),VuR(3,3),VdL(3,3),VdR(3,3),VnL(3,3)
       double complex VnR(3,3),VeL(3,3),VeR(3,3),epsi(4,2,3)
+      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
       integer d
 
       include 'common.f'
@@ -27,8 +28,11 @@ C*******************************************************************************
 C      write(*,*) arg     
 C      call RotMatrix(Vmat,debug)
 C      call Epsilon(epsi,debug)
-      call VPVt(VPV,debug)
-      call Delt(Del,debug)
+C      call VPVt(VPV,debug)
+C      call Delt(Del,debug)
+      call DBDG(DB,DG,debug)
+
+
       
       stop
       end
