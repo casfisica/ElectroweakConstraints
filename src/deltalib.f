@@ -258,33 +258,58 @@ C*******************************************************************************
       
 C--------------------------------------------------------------------------------C 
 C                                                                                C 
-C   Subrutine VPV() Calculate the product VPV^t    C 
+C           Subrutine VPVt(VPT,debug) Calculate the product VPV^t                C 
 C                                                                                C 
 C--------------------------------------------------------------------------------C
 
 
+      subroutine VPVt(VPV,debug)
+      implicit none
+      double complex VPV(3,4,2,3,3),Vmat(4,2,3,3) !debe de ir en commondelta     #
+      integer betha,i,j,P,II
+      logical debug             ! If is .true. use debuguin part
 
+
+      call RotMatrix(Vmat,debug)
       
-
+      do 500, betha=1, 3
+         do 100, P=1, 4
+            do 200, II=1, 2
+               do 300, i=1, 3
+                  do 400, j=1, 3
+                     VPV(betha,P,II,i,j)= Vmat(P,II,i,betha)*
+     .                    dconjg(Vmat(P,II,j,betha))
+ 400              continue
+ 300           continue
+ 200        continue
+ 100     continue
+ 500  continue
+      
 
 C***********************************DEBUGGING***********************************C   
          
       if (debug) then
-         open (unit=12,file='.out',status='new')
-
-         do 400, P=1, 4
-            do 500, II=1, 2
-               do 600, i=1, 3
-                  write(11,*) "VPV(",P,II,i,j,")=",epsi(P,II,i)  
- 600           continue
- 500        continue
- 400     continue
-                  
+         open (unit=12,file='VPV.out',status='new')
+         
+         do 1000, betha=1, 3
+            do 600, P=1, 4
+               do 700, II=1, 2
+                  do 800, i=1, 3
+                     do 900, j=1, 3
+                        write(12,*) "VPV(",betha,P,II,i,j,")=",
+     .                       VPV(betha,P,II,i,j)
+ 900                 continue
+ 800              continue
+ 700           continue
+ 600        continue
+ 1000    continue
+         
       end if                    !End debugguing if
-      close(unit=11)
+      
+      close(unit=12)
       
       return
-      end                       !End subroutine RotMatrix
+      end                       !End subroutine VPVt
 
 C********************************************************************************C
 
@@ -293,6 +318,38 @@ C*******************************************************************************
 
 
 
+      
+CC--------------------------------------------------------------------------------C 
+CC                                                                                C 
+CC   Subrutine     C 
+CC                                                                                C 
+CC--------------------------------------------------------------------------------C
+C 
+C 
+C 
+C 
+CC***********************************DEBUGGING***********************************C  
+C         
+C      if (debug) then
+C         open (unit=12,file='.out',status='new')
+C 
+C         do 400, P=1, 4
+C            do 500, II=1, 2
+C               do 600, i=1, 3
+C                  write(11,*) "epsi(",P,II,i,")=",epsi(P,II,i)  
+C 600           continue
+C 500        continue
+C 400     continue
+C                  
+C      end if                    !End debugguing if
+C      close(unit=11)
+C      
+C      return
+C      end                       !End subroutine RotMatrix
+C 
+CC********************************************************************************C
+
+      
       
 CC--------------------------------------------------------------------------------C 
 CC                                                                                C 
