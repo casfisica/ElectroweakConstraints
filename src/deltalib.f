@@ -81,12 +81,14 @@ C***********************************DEBUGGING***********************************
          
          if (debug) then
             open (unit=10,file='RotMatrix.out',status='new')
-            
+ 2000       format('',A5,4I2,A2,2E15.7)
+          
             do 500, p=1, 4
                do 600, II=1, 2
                   do 700, i=1, 3
                      do 800, j=1, 3
-                        write(10,*) "Vmat(",P,II,i,j,")=",Vmat(P,II,i,j)            
+                        write(10,2000) "Vmat(",P,II,i,j,")=",
+     .                       Vmat(P,II,i,j)            
  800                 continue
  700              continue
  600           continue
@@ -237,11 +239,12 @@ C***********************************DEBUGGING***********************************
          
       if (debug) then
          open (unit=11,file='Epsilon.out',status='new')
+ 2000    format('',A5,3I2,A2,2E15.7)
 
          do 400, P=1, 4
             do 500, II=1, 2
                do 600, i=1, 3
-                  write(11,*) "epsi(",P,II,i,")=",epsi(P,II,i)  
+                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
  600           continue
  500        continue
  400     continue
@@ -269,7 +272,7 @@ C-------------------------------------------------------------------------------
       integer betha,i,j,P,II
       logical debug             ! If is .true. use debuguin part
 
-
+C     Import the values of Vmatrix(rotation matrix)
       call RotMatrix(Vmat,debug)
       
       do 500, betha=1, 3
@@ -290,13 +293,14 @@ C***********************************DEBUGGING***********************************
          
       if (debug) then
          open (unit=12,file='VPV.out',status='new')
+ 2000    format('',A4,5I2,A2,2E15.7)
          
          do 1000, betha=1, 3
             do 600, P=1, 4
                do 700, II=1, 2
                   do 800, i=1, 3
                      do 900, j=1, 3
-                        write(12,*) "VPV(",betha,P,II,i,j,")=",
+                        write(12,2000) "VPV(",betha,P,II,i,j,")=",
      .                       VPV(betha,P,II,i,j)
  900                 continue
  800              continue
@@ -316,38 +320,61 @@ C*******************************************************************************
 
 
 
-
-
       
-CC--------------------------------------------------------------------------------C 
-CC                                                                                C 
-CC   Subrutine     C 
-CC                                                                                C 
-CC--------------------------------------------------------------------------------C
-C 
-C 
-C 
-C 
-CC***********************************DEBUGGING***********************************C  
-C         
-C      if (debug) then
-C         open (unit=12,file='.out',status='new')
-C 
-C         do 400, P=1, 4
-C            do 500, II=1, 2
-C               do 600, i=1, 3
-C                  write(11,*) "epsi(",P,II,i,")=",epsi(P,II,i)  
-C 600           continue
-C 500        continue
-C 400     continue
-C                  
-C      end if                    !End debugguing if
-C      close(unit=11)
-C      
-C      return
-C      end                       !End subroutine RotMatrix
-C 
-CC********************************************************************************C
+C--------------------------------------------------------------------------------C 
+C                                                                                C 
+C   Subrutine Delt(epsi,debug)    C 
+C                                                                                C 
+C--------------------------------------------------------------------------------C
+ 
+      subroutine Delt(Del,debug)
+      implicit none
+      double complex epsi(4,2,3), Del(3,3,4,2)
+      integer P,II,B,a
+      logical debug             ! If is .true. use debuguin part
+
+      call Epsilon(epsi,debug)
+
+      do 100, B=1, 3
+         do 200, a=1, 3
+            do 300, P=1, 4
+               do 400, II=1, 2
+                  Del(B,a,P,II)=epsi(P,II,B)-epsi(P,II,a)
+ 400           continue
+ 300        continue
+ 200     continue
+ 100  continue
+      
+      
+ 
+C***********************************DEBUGGING***********************************C  
+         
+      if (debug) then
+         open (unit=13,file='Del.out',status='new')
+C     Format $A#:character, $: number of entries of the type
+C     #: number of spaces; I:integer; D: doubles; F
+ 1000    format('',A4,4I2,A2,2E15.7) 
+
+
+         
+         do 500, B=1, 3
+            do 600, a=1, 3
+               do 700, P=1, 4
+                  do 800, II=1, 2
+                     write(13,1000) "Del(",B,a,P,II,")=",Del(B,a,P,II)
+ 800              continue
+ 700           continue
+ 600        continue
+ 500     continue
+                  
+      end if                    !End debugguing if
+
+      close(unit=13)
+      
+      return
+      end                       !End subroutine RotMatrix
+ 
+C********************************************************************************C
 
       
       
