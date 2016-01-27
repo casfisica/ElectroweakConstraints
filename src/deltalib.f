@@ -479,32 +479,72 @@ C***********************************DEBUGGING***********************************
 C********************************************************************************C
 
       
-CC--------------------------------------------------------------------------------C 
-CC                                                                                C 
-CC   Subrutine     C 
-CC                                                                                C 
-CC--------------------------------------------------------------------------------C
-C 
-C 
-C 
-C 
-CC***********************************DEBUGGING***********************************C  
-C         
-C      if (debug) then
-C         open (unit=12,file='.out',status='new')
-C2000    format('',A4,5I2,A2,2E15.7) 
-C         do 400, P=1, 4
-C            do 500, II=1, 2
-C               do 600, i=1, 3
-C                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
-C 600           continue
-C 500        continue
-C 400     continue
-C                  
-C      end if                    !End debugguing if
-C      close(unit=11)
-C      
-C      return
-C      end                       !End subroutine RotMatrix
-C 
-CC********************************************************************************C
+C--------------------------------------------------------------------------------C 
+C                                                                                C 
+C   Subrutine DCDCM    C 
+C                                                                                C 
+C--------------------------------------------------------------------------------C
+ 
+      subroutine DCDCM()
+      implicit none
+      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
+      double complex DC(4,2,4,2,3,3,3,3), DCM(4,2,4,2,3,3,3,3)
+      integer P,II,C,JJ,i,j,k,l
+      logical debug             ! If is .true. use debuguin part
+
+      include 'commondelta'
+      
+      call DBDG(DB,DG,debug)
+
+      do 100, B=1, 3
+         do 200, a=1, 3
+            do 300, P=1, 4
+               do 400, II=1, 2
+                  do 500, i=1, 3
+                     do 600, j=1, 3
+                        do 700, C=1, 4
+                           do 800, JJ=1, 2
+                              do 900, k=1, 3
+                                 do 1000, l=1, 3
+                                    DC(4,2,4,2,3,3,3,3)= epsi(P,II,i)
+     .                                   
+     .
+ 1000                            continue
+ 900                          continue
+ 800                       continue
+ 700                    continue
+ 600                 continue
+ 500              continue
+ 400           continue
+ 300        continue
+ 200     continue
+ 100  continue
+
+C     1: Vectorial, 2: Axial
+
+
+
+      
+ 
+C***********************************DEBUGGING***********************************C  
+         
+      if (debug) then
+         open (unit=12,file='DCDCM.out',status='new')
+
+ 2000    format('',A4,5I2,A2,2E15.7) 
+
+         do 400, P=1, 4
+            do 500, II=1, 2
+               do 600, i=1, 3
+                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
+ 600           continue
+ 500        continue
+ 400     continue
+                  
+      end if                    !End debugguing if
+      close(unit=11)
+      
+      return
+      end                       !End subroutine RotMatrix
+ 
+C********************************************************************************C

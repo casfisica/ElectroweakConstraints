@@ -17,7 +17,7 @@ C*************************************Arguments*********************************
       call getarg(d, arg)
       end do
 
-      if (arg.eq.'d') then
+      if (arg.eq.'-d') then
          debug=.true.
       end if
       
