@@ -478,73 +478,228 @@ C***********************************DEBUGGING***********************************
  
 C********************************************************************************C
 
-      
+
 C--------------------------------------------------------------------------------C 
 C                                                                                C 
-C   Subrutine DCDCM    C 
+C                           Subrutine ZSM                                       C 
 C                                                                                C 
 C--------------------------------------------------------------------------------C
- 
-      subroutine DCDCM()
-      implicit none
-      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
-      double complex DC(4,2,4,2,3,3,3,3), DCM(4,2,4,2,3,3,3,3)
-      integer P,II,C,JJ,i,j,k,l
-      logical debug             ! If is .true. use debuguin part
 
-      include 'commondelta'
-      
-      call DBDG(DB,DG,debug)
+      subroutine ZSM(epsi1,debug)
+      dimension eps1_L(0:9),eps1_R(0:9)
+      integer P,II,i,j      
+      double complex epsi1(4,2,3)
+      logical debug
 
-      do 100, B=1, 3
-         do 200, a=1, 3
-            do 300, P=1, 4
-               do 400, II=1, 2
-                  do 500, i=1, 3
-                     do 600, j=1, 3
-                        do 700, C=1, 4
-                           do 800, JJ=1, 2
-                              do 900, k=1, 3
-                                 do 1000, l=1, 3
-                                    DC(4,2,4,2,3,3,3,3)= epsi(P,II,i)
-     .                                   
-     .
- 1000                            continue
- 900                          continue
- 800                       continue
- 700                    continue
- 600                 continue
- 500              continue
- 400           continue
+            
+      do 197, j=0, 9
+         eps1_L(j) = (v(j) + a(j))/2
+         eps1_R(j) = (v(j) - a(j))/2
+ 197  continue
+
+      do 100, P=1, 4
+         do 200, II=1, 2
+            do 300, i=1, 3
+               if (P.eq.1) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi1(P,II,i)= eps1_L(4) !UP Left
+                     else if (i.eq.2) then
+                        epsi1(P,II,i)= eps1_L(5) !Charm Left
+                     else if (i.eq.3) then
+                        epsi1(P,II,i)= eps1_L(6) !Top Left
+                     else
+                        STOP 'errEps'
+                     end if
+                  else if (II.eq.2) then
+                     if (i.eq.1) then
+                        epsi1(P,II,i)= eps1_R(4) !UP Right
+                     else if (i.eq.2) then
+                        epsi1(P,II,i)= eps1_R(5) !Charm Right
+                     else if (i.eq.3) then
+                        epsi1(P,II,i)= eps1_R(6) !Top Right
+                     else
+                        STOP 'errEps'
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else if (P.eq.2) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi1(P,II,i)= eps1_L(7) !Down Left
+                     else if (i.eq.2) then           
+                        epsi1(P,II,i)= eps1_L(8) !Strange Left
+                     else if (i.eq.3) then           
+                        epsi1(P,II,i)= eps1_L(9) !Bottom Left
+                     else                            
+                        STOP 'errEps'      
+                     end if                          
+                  else if (II.eq.2) then             
+                     if (i.eq.1) then                
+                        epsi1(P,II,i)= eps1_R(7) !Down Right
+                     else if (i.eq.2) then           
+                        epsi1(P,II,i)= eps1_R(8) !Strange Right
+                     else if (i.eq.3) then           
+                        epsi1(P,II,i)= eps1_R(9) !Bottom Right
+                     else                            
+                        STOP 'errEps'      
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else if (P.eq.3) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi1(P,II,i)= eps1_L(0) !Neutrino e- Left
+                     else if (i.eq.2) then           
+                        epsi1(P,II,i)= eps1_L(0) !Neutrino M Left
+                     else if (i.eq.3) then           
+                        epsi1(P,II,i)= eps1_L(0) !Neutrino T Left
+                     else                            
+                        STOP 'errEps'      
+                     end if                          
+                  else if (II.eq.2) then             
+                     if (i.eq.1) then                
+                        epsi1(P,II,i)= eps1_R(0)  !Neutrino e- Right
+                     else if (i.eq.2) then           
+                        epsi1(P,II,i)= eps1_R(0) !Neutrino M Right
+                     else if (i.eq.3) then           
+                        epsi1(P,II,i)= eps1_R(0) !Neutrino T Right
+                     else                            
+                        STOP 'errEps'      
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else if (P.eq.4) then
+                  if (II.eq.1) then
+                     if (i.eq.1) then
+                        epsi1(P,II,i)= eps1_L(1)  ! e- Left
+                     else if (i.eq.2) then           
+                        epsi1(P,II,i)= eps1_L(2) ! Mu Left
+                     else if (i.eq.3) then           
+                        epsi1(P,II,i)= eps1_L(3) ! Tau Left
+                     else                            
+                        STOP 'errEps'      
+                     end if                          
+                  else if (II.eq.2) then             
+                     if (i.eq.1) then                
+                        epsi1(P,II,i)= eps1_R(1)  ! e- Right
+                     else if (i.eq.2) then           
+                        epsi1(P,II,i)= eps1_R(2) ! Mu Right
+                     else if (i.eq.3) then           
+                        epsi1(P,II,i)= eps1_R(3) !Tau Right
+                     else                             
+                        STOP 'errEps'       
+                     end if
+                  else
+                     STOP 'errEps'
+                  end if
+               else
+                  STOP 'errEps'   
+               end if
  300        continue
  200     continue
  100  continue
 
-C     1: Vectorial, 2: Axial
 
-
-
-      
- 
-C***********************************DEBUGGING***********************************C  
+C***********************************DEBUGGING***********************************C   
          
       if (debug) then
-         open (unit=12,file='DCDCM.out',status='new')
+         open (unit=15,file='ZSM.out',status='new')
 
- 2000    format('',A4,5I2,A2,2E15.7) 
-
+ 2000    format('',A6,3I2,A2,2E15.7)
+         
          do 400, P=1, 4
             do 500, II=1, 2
                do 600, i=1, 3
-                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
+                  write(11,2000) "epsi1(",P,II,i,")=",epsi1(P,II,i)  
  600           continue
  500        continue
  400     continue
                   
       end if                    !End debugguing if
-      close(unit=11)
+      close(unit=15)
       
       return
-      end                       !End subroutine RotMatrix
- 
+      end                       !End subroutine ZSM
+
 C********************************************************************************C
+
+      
+      
+CC--------------------------------------------------------------------------------C 
+CC                                                                                C 
+CC   Subrutine DCDCM    C 
+CC                                                                                C 
+CC--------------------------------------------------------------------------------C
+C 
+C      subroutine DCDCM()
+C      implicit none
+C      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
+C      double complex DC(4,2,4,2,3,3,3,3), DCM(4,2,4,2,3,3,3,3)
+C      integer P,II,C,JJ,i,j,k,l
+C      logical debug             ! If is .true. use debuguin part
+C 
+C      include 'commondelta'
+C 
+CC     Standar Model Cuples to Z
+C      
+C 
+C 
+C      
+C      call DBDG(DB,DG,debug)
+C 
+C      do 100, B=1, 3
+C         do 200, a=1, 3
+C            do 300, P=1, 4
+C               do 400, II=1, 2
+C                  do 500, i=1, 3
+C                     do 600, j=1, 3
+C                        do 700, C=1, 4
+C                           do 800, JJ=1, 2
+C                              do 900, k=1, 3
+C                                 do 1000, l=1, 3
+C                                    DC(4,2,4,2,3,3,3,3)= epsi(P,II,i)
+C     .                                   
+C     .
+C 1000                            continue
+C 900                          continue
+C 800                       continue
+C 700                    continue
+C 600                 continue
+C 500              continue
+C 400           continue
+C 300        continue
+C 200     continue
+C 100  continue
+C 
+CC     1: Vectorial, 2: Axial
+C 
+C 
+C 
+C      
+C 
+CC***********************************DEBUGGING***********************************C  
+C         
+C      if (debug) then
+C         open (unit=12,file='DCDCM.out',status='new')
+C 
+C 2000    format('',A4,5I2,A2,2E15.7) 
+C 
+C         do 400, P=1, 4
+C            do 500, II=1, 2
+C               do 600, i=1, 3
+C                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
+C 600           continue
+C 500        continue
+C 400     continue
+C                  
+C      end if                    !End debugguing if
+C      close(unit=11)
+C      
+C      return
+C      end                       !End subroutine RotMatrix
+C 
+CC********************************************************************************C
