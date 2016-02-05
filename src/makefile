@@ -5,7 +5,7 @@ COMPILE.f=gfortran -c -C -g
 LINK.f=gfortran -g
 FFLAGS= -g
 
-casobj  = main.f deltalib.f vmatrix.f zprime.f sin2th.f
+casobj  = main.f deltalib.f vmatrix.f zprime.f
 
 
 #          polylogs.o spence.o ffcli2.o ffxli2.o ffinit.o main.o zprime.o \

@@ -113,10 +113,10 @@ C                                                                               
 C--------------------------------------------------------------------------------C
 
 
-      subroutine Epsilon(epsi,debug)
+      subroutine Epsilon(epsi,gcop,debug)
       implicit none
       logical debug             ! If is .true. use debuguin part
-      double complex epsi(4,2,3)
+      double complex epsi(4,2,3), gcop(4,2,3)
       integer P,II,i,j
       double precision xval(27)
       
@@ -232,7 +232,22 @@ C     Import the coupling values of Z' to fermions
  200     continue
  100  continue
 
-
+        
+         do 2400, P=1, 4
+            do 2500, II=1, 2    !Para el caso de g 1:Axial, 2:Vectorial
+               do 2600, i=1, 3
+                  if (II.eq.1) then
+                     gcop(P,II,i)= epsi(P,1,i)-
+     .                    epsi(P,2,i)
+                  else if (II.eq.2) then
+                     gcop(P,II,i)= epsi(P,1,i)-
+     .                    epsi(P,2,i)
+                  else
+                  end if
+ 2600          continue
+ 2500       continue
+ 2400    continue   
+      
 
 
 C***********************************DEBUGGING***********************************C   
@@ -248,6 +263,14 @@ C***********************************DEBUGGING***********************************
  600           continue
  500        continue
  400     continue
+
+         do 410, P=1, 4
+            do 510, II=1, 2
+               do 610, i=1, 3
+                  write(11,2000) "gcop(",P,II,i,")=",gcop(P,II,i)  
+ 610           continue
+ 510        continue
+ 410     continue
                   
       end if                    !End debugguing if
       close(unit=11)
@@ -329,11 +352,11 @@ C-------------------------------------------------------------------------------
  
       subroutine Delt(Del,debug)
       implicit none
-      double complex epsi(4,2,3), Del(3,3,4,2)
+      double complex epsi(4,2,3), Del(3,3,4,2), gcop(4,2,3)
       integer P,II,B,a
       logical debug             ! If is .true. use debuguin part
 
-      call Epsilon(epsi,debug)
+      call Epsilon(epsi,gcop,debug)
 
       do 100, B=1, 3
          do 200, a=1, 3
@@ -481,17 +504,26 @@ C*******************************************************************************
 
 C--------------------------------------------------------------------------------C 
 C                                                                                C 
-C                           Subrutine ZSM                                       C 
+C                           Subrutine ZSM                                        C 
 C                                                                                C 
 C--------------------------------------------------------------------------------C
 
-      subroutine ZSM(epsi1,debug)
-      dimension eps1_L(0:9),eps1_R(0:9)
-      integer P,II,i,j      
-      double complex epsi1(4,2,3)
+      subroutine ZSM(epsi1,gcop1,debug)
+      dimension eps1_L(0:9),eps1_R(0:9), v(0:9),a(0:9)
+      integer P,II,i,j,f      
+      double complex epsi1(4,2,3), gcop1(4,2,3)
       logical debug
 
-            
+
+*******************************************************************************
+C      Temporal
+******************************************************************************      
+      do 220 f = 0, 9
+         v(f) = (2*(f) -1)/2
+         a(f) =  f
+ 220  continue
+******************************************************************************
+      
       do 197, j=0, 9
          eps1_L(j) = (v(j) + a(j))/2
          eps1_R(j) = (v(j) - a(j))/2
@@ -604,6 +636,27 @@ C-------------------------------------------------------------------------------
  100  continue
 
 
+
+      do 111, P=1, 4
+         do 211, II=1, 2
+            do 311, i=1, 3
+               if (II.eq.1) then
+                  gcop1(P,II,i)=epsi1(P,1,i)+epsi1(P,2,i)
+               else if (II.eq.2) then
+                  gcop1(P,II,i)=epsi1(P,1,i)-epsi1(P,2,i)
+               else
+                  STOP 'errEps'
+               end if
+ 311        continue
+ 211     continue
+ 111  continue
+         
+
+
+
+
+
+      
 C***********************************DEBUGGING***********************************C   
          
       if (debug) then
@@ -614,11 +667,20 @@ C***********************************DEBUGGING***********************************
          do 400, P=1, 4
             do 500, II=1, 2
                do 600, i=1, 3
-                  write(11,2000) "epsi1(",P,II,i,")=",epsi1(P,II,i)  
+                  write(15,2000) "epsi1(",P,II,i,")=",epsi1(P,II,i)  
  600           continue
  500        continue
  400     continue
-                  
+
+
+         do 410, P=1, 4
+            do 510, II=1, 2
+               do 610, i=1, 3
+                  write(15,2000) "gcop1(",P,II,i,")=",gcop1(P,II,i)  
+ 610           continue
+ 510        continue
+ 410     continue
+
       end if                    !End debugguing if
       close(unit=15)
       
@@ -629,77 +691,244 @@ C*******************************************************************************
 
       
       
-CC--------------------------------------------------------------------------------C 
-CC                                                                                C 
-CC   Subrutine DCDCM    C 
-CC                                                                                C 
-CC--------------------------------------------------------------------------------C
-C 
-C      subroutine DCDCM()
-C      implicit none
-C      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
-C      double complex DC(4,2,4,2,3,3,3,3), DCM(4,2,4,2,3,3,3,3)
-C      integer P,II,C,JJ,i,j,k,l
-C      logical debug             ! If is .true. use debuguin part
-C 
+C--------------------------------------------------------------------------------C 
+C                                                                                C 
+C   Subrutine DCDCM    C 
+C                                                                                C 
+C--------------------------------------------------------------------------------C
+ 
+      subroutine DCDCM(w,y,DC,DCM,debug)
+      implicit none
+      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3), deltaij(3,3) !Commonlib 
+      double complex DC(4,4,4,3,3,3,3), DCM(4,4,4,3,3,3,3),gcop1(4,2,3)
+      double complex epsi1(4,2,3),w,y,epsi(4,2,3),gcop(4,2,3)
+      integer P,II,C,i,j,k,l,a,B
+      logical debug             ! If is .true. use debuguin part
+ 
 C      include 'commondelta'
-C 
-CC     Standar Model Cuples to Z
-C      
-C 
-C 
-C      
-C      call DBDG(DB,DG,debug)
-C 
-C      do 100, B=1, 3
-C         do 200, a=1, 3
-C            do 300, P=1, 4
-C               do 400, II=1, 2
-C                  do 500, i=1, 3
-C                     do 600, j=1, 3
-C                        do 700, C=1, 4
-C                           do 800, JJ=1, 2
-C                              do 900, k=1, 3
-C                                 do 1000, l=1, 3
-C                                    DC(4,2,4,2,3,3,3,3)= epsi(P,II,i)
-C     .                                   
-C     .
-C 1000                            continue
-C 900                          continue
-C 800                       continue
-C 700                    continue
-C 600                 continue
-C 500              continue
-C 400           continue
-C 300        continue
-C 200     continue
-C 100  continue
-C 
-CC     1: Vectorial, 2: Axial
-C 
-C 
-C 
-C      
-C 
-CC***********************************DEBUGGING***********************************C  
-C         
-C      if (debug) then
-C         open (unit=12,file='DCDCM.out',status='new')
-C 
-C 2000    format('',A4,5I2,A2,2E15.7) 
-C 
-C         do 400, P=1, 4
-C            do 500, II=1, 2
-C               do 600, i=1, 3
-C                  write(11,2000) "epsi(",P,II,i,")=",epsi(P,II,i)  
-C 600           continue
-C 500        continue
-C 400     continue
-C                  
-C      end if                    !End debugguing if
-C      close(unit=11)
-C      
-C      return
-C      end                       !End subroutine RotMatrix
-C 
-CC********************************************************************************C
+C     II is a double indice, 1: LL(left, left), 2: LR, 3: RL, 4:  
+   
+      do 2200, i=1, 3
+         do 2300, j=1, 3
+            if (i.eq.j) then
+               deltaij(i,j)= 1d0
+            else
+               deltaij(i,j)= 0d0
+            end if
+            
+ 2300    continue
+ 2200 continue
+
+      call DBDG(DB,DG,debug)    !Se llaman desde afuera para evitar calcularlos
+      call ZSM(epsi1,gcop1,debug)     !muchas veces
+
+
+      
+      do 100, B=1, 3
+         do 200, a=1, 3
+            do 300, P=1, 4
+               do 400, II=1, 4
+                  do 500, i=1, 3
+                     do 600, j=1, 3
+                        do 700, C=1, 4
+                           do 900, k=1, 3
+                              do 1000, l=1, 3
+                                 if (II.eq.1) then
+                                    DC(P,II,C,i,j,k,l)= w
+     .                                   *deltaij(i,j)*epsi1(P,1,a)
+     .                                   *DB(a,B,C,1,k,l)
+     .                                   +w*deltaij(k,l)*epsi1(C,1,a)
+     .                                   *DB(a,B,P,1,i,j)
+     .                                   +y*deltaij(i,j)*epsi(P,1,a)
+     .                                   *DB(a,B,C,1,k,l)
+     .                                   +y*deltaij(k,l)*epsi(C,1,a)
+     .                                   *DB(a,B,P,1,i,j)
+     .                                   +Y*DB(a,B,C,1,k,l)
+     .                                   *DB(a,B,P,1,i,j)
+                                 else if (II.eq.2) then
+                                    DC(P,II,C,i,j,k,l)= w
+     .                                   *deltaij(i,j)*epsi1(P,1,a)
+     .                                   *DB(a,B,C,2,k,l)
+     .                                   +w*deltaij(k,l)*epsi1(C,2,a)
+     .                                   *DB(a,B,P,1,i,j)
+     .                                   +y*deltaij(i,j)*epsi(P,1,a)
+     .                                   *DB(a,B,C,2,k,l)
+     .                                   +y*deltaij(k,l)*epsi(C,2,a)
+     .                                   *DB(a,B,P,1,i,j)
+     .                                   +Y*DB(a,B,C,2,k,l)
+     .                                   *DB(a,B,P,1,i,j)
+                                 else if (II.eq.3) then
+                                    DC(P,II,C,i,j,k,l)= w
+     .                                   *deltaij(i,j)*epsi1(P,2,a)
+     .                                   *DB(a,B,C,1,k,l)
+     .                                   +w*deltaij(k,l)*epsi1(C,1,a)
+     .                                   *DB(a,B,P,2,i,j)
+     .                                   +y*deltaij(i,j)*epsi(P,2,a)
+     .                                   *DB(a,B,C,1,k,l)
+     .                                   +y*deltaij(k,l)*epsi(C,1,a)
+     .                                   *DB(a,B,P,2,i,j)
+     .                                   +Y*DB(a,B,C,1,k,l)
+     .                                   *DB(a,B,P,2,i,j)
+                                 else if (II.eq.4) then
+                                    DC(P,II,C,i,j,k,l)= w
+     .                                   *deltaij(i,j)*epsi1(P,2,a)
+     .                                   *DB(a,B,C,2,k,l)
+     .                                   +w*deltaij(k,l)*epsi1(C,2,a)
+     .                                   *DB(a,B,P,2,i,j)
+     .                                   +y*deltaij(i,j)*epsi(P,2,a)
+     .                                   *DB(a,B,C,2,k,l)
+     .                                   +y*deltaij(k,l)*epsi(C,2,a)
+     .                                   *DB(a,B,P,2,i,j)
+     .                                   +Y*DB(a,B,C,2,k,l)
+     .                                   *DB(a,B,P,2,i,j)
+                                 else
+                                    STOP 'errEps'
+                                 end if
+ 1000                         continue
+ 900                       continue
+ 700                    continue
+ 600                 continue
+ 500              continue
+ 400           continue
+ 300        continue
+ 200     continue
+ 100  continue
+
+C     de II indice is a double one, next it is the mining
+C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
+      
+      do 110, B=1, 3
+         do 210, a=1, 3
+            do 310, P=1, 4
+               do 410, II=1, 4
+                  do 510, i=1, 3
+                     do 610, j=1, 3
+                        do 710, C=1, 4
+                           do 910, k=1, 3
+                              do 1100, l=1, 3
+                                 if (II.eq.1) then
+                                    DCM(P,II,C,i,j,k,l)=(1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,1,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,1,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,1,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,1,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*DG(a,B,P,1,i,j)*
+     .                                   DG(a,B,C,1,k,l))
+                                 else if (II.eq.2) then
+                                    DCM(P,II,C,i,j,k,l)=(-1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,1,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,2,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,1,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,2,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*DG(a,B,P,1,i,j)*
+     .                                   DG(a,B,C,2,k,l))
+                                 else if (II.eq.3) then
+                                    DCM(P,II,C,i,j,k,l)= (-1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,2,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,1,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,2,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,1,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*DG(a,B,P,2,i,j)*
+     .                                   DG(a,B,C,1,k,l))
+                                 else if (II.eq.4) then
+                                    DCM(P,II,C,i,j,k,l)= (1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,2,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,2,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,2,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,2,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*DG(a,B,P,2,i,j)*
+     .                                   DG(a,B,C,2,k,l))
+                                 else
+                                    STOP 'errEps'
+                                 end if
+ 1100                         continue
+ 910                       continue
+ 710                    continue
+ 610                 continue
+ 510              continue
+ 410           continue
+ 310        continue
+ 210     continue
+ 110  continue
+ 
+      
+ 
+C***********************************DEBUGGING***********************************C  
+         
+      if (debug) then
+         open (unit=15,file='DCDCM.out',status='new')
+ 
+ 2000    format('',A3,7I2,A2,2E15.7) 
+ 2001    format('',A4,7I2,A2,2E15.7)
+         
+         do 101, B=1, 3
+            do 201, a=1, 3
+               do 301, P=1, 4
+                  do 401, II=1, 4
+                     do 501, i=1, 3
+                        do 601, j=1, 3
+                           do 701, C=1, 4
+                              do 901, k=1, 3
+                                 do 1001, l=1, 3
+                                    write(15,2000) "DC(",P,II,C,i,j,k,l,
+     .                                   ")=", DC(P,II,C,i,j,k,l)
+ 1001                            continue
+ 901                          continue
+ 701                       continue
+ 601                    continue
+ 501                 continue
+ 401              continue
+ 301           continue
+ 201        continue
+ 101     continue
+
+         write(15,*)"-------------------------------------------"
+         
+         do 111, B=1, 3
+            do 211, a=1, 3
+               do 311, P=1, 4
+                  do 411, II=1, 4
+                     do 511, i=1, 3
+                        do 611, j=1, 3
+                           do 711, C=1, 4
+                              do 911, k=1, 3
+                                 do 1101, l=1, 3
+                                    write(15,2001) "DCM(",P,II,C,i,j,k,l
+     .                                   ,")=", DCM(P,II,C,i,j,k,l)
+ 1101                            continue
+ 911                          continue
+ 711                       continue
+ 611                    continue
+ 511                 continue
+ 411              continue
+ 311           continue
+ 211        continue
+ 111     continue
+         
+
+
+
+
+      end if                    !End debugguing if
+      close(unit=15)
+      
+      return
+      end                       !End subroutine RotMatrix
+ 
+C********************************************************************************C
