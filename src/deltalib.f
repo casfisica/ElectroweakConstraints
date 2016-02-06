@@ -1,36 +1,35 @@
-C================================================================================C 
-C                                                                                C
-C     Sub rutinas para modificar el archivo fit.f y tener en cuenta el segundo   C 
-C     orden en los coeficientes de Wilson                                        C 
-C                                                                                C 
-C================================================================================C
+*================================================================================* 
+*                                                                                *
+*     Sub rutinas para modificar el archivo fit.f y tener en cuenta el segundo   * 
+*     orden en los coeficientes de Wilson                                        * 
+*                                                                                * 
+*================================================================================*
 
 
 
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C     Sub rutina para llamar Vmatrix, y organizar su salida en estructura        C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C 
+*--------------------------------------------------------------------------------* 
+*                                                                                * 
+*     Sub rutina para llamar Vmatrix, y organizar su salida en estructura        * 
+*                                                                                * 
+*--------------------------------------------------------------------------------* 
 
 
-      subroutine RotMatrix(Vmat,debug)
+      subroutine RotMatrix(debug)
       implicit none
       logical debug             ! If is .true. use debuguin part
-      double complex VuL(3,3),VuR(3,3),VdL(3,3),VdR(3,3),VnL(3,3)
-      double complex VnR(3,3),VeL(3,3),VeR(3,3) !Deben de ir en comondelta      #
-      double complex Vmat(4,2,3,3)
+C      double complex VuL(3,3),VuR(3,3),VdL(3,3),VdR(3,3),VnL(3,3)
+C      double complex VnR(3,3),VeL(3,3),VeR(3,3) !Deben de ir en comondelta      #
+C      double complex Vmat(4,2,3,3)
       integer P,II,i,j
+      include 'commondelta.f'   !the out Vmat is inside of commondelta.f
 
-C      include 'commondelta'
-
-C     Import the values of the rotation matrix
+*     Import the values of the rotation matrix
       call Vmatrix(VuL,VuR,VdL,VdR,VnL,VnR,VeL,VeR)
 
-C     Organize the values of rotation matrix as an estructure Vmat(P,I,i,j)
-C     where P: Fermion type; 1:UP, 2:DOWN, 3:Neutrino, 4: Electron
-C     I: Chirality; 1:Left, 2:Right
-C     i,j: Flavor or Families; 1:electron, 2:muon, 3:Tau
+*     Organize the values of rotation matrix as an estructure Vmat(P,I,i,j)
+*     where P: Fermion type; 1:UP, 2:DOWN, 3:Neutrino, 4: Electron
+*     I: Chirality; 1:Left, 2:Right
+*     i,j: Flavor or Families; 1:electron, 2:muon, 3:Tau
       
       do 100, P=1, 4            !Fermion type
          do 200, II=1, 2        !Chirality
@@ -77,7 +76,7 @@ C     i,j: Flavor or Families; 1:electron, 2:muon, 3:Tau
  100  continue
       
          
-C***********************************DEBUGGING***********************************C   
+************************************DEBUGGING************************************   
          
          if (debug) then
             open (unit=10,file='RotMatrix.out',status='new')
@@ -102,26 +101,26 @@ C***********************************DEBUGGING***********************************
       return
       end                       !End subroutine RotMatrix
 
-C********************************************************************************C
+**********************************************************************************
 
 
       
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C   Subrutine Epsilon(epsi,debug), call zprime and organize on a estructure      C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C
+*--------------------------------------------------------------------------------* 
+*                                                                                * 
+*   Subrutine Epsilon(epsi,gcop,debug), call zprime and organize on a estructure * 
+*                                                                                * 
+*--------------------------------------------------------------------------------*
 
 
-      subroutine Epsilon(epsi,gcop,debug)
+      subroutine Epsilon(debug)
       implicit none
       logical debug             ! If is .true. use debuguin part
-      double complex epsi(4,2,3), gcop(4,2,3)
+C      double complex epsi(4,2,3), gcop(4,2,3)
       integer P,II,i,j
       double precision xval(27)
       
       include 'common.f'
-C      include 'commondelta'
+      include 'commondelta.f'   !The outs epsi,gcop, are inside
 
 C     Import the coupling values of Z' to fermions
       call zprimecoup(xval,27)  
@@ -250,7 +249,7 @@ C     Import the coupling values of Z' to fermions
       
 
 
-C***********************************DEBUGGING***********************************C   
+************************************DEBUGGING************************************   
          
       if (debug) then
          open (unit=11,file='Epsilon.out',status='new')
@@ -278,26 +277,27 @@ C***********************************DEBUGGING***********************************
       return
       end                       !End subroutine RotMatrix
 
-C********************************************************************************C
+**********************************************************************************
 
 
       
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C           Subrutine VPVt(VPT,debug) Calculate the product VPV^t                C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C
+*--------------------------------------------------------------------------------* 
+*                                                                                * 
+*           Subrutine VPVt(VPT,debug) Calculate the product VPV^t                * 
+*                                                                                * 
+*--------------------------------------------------------------------------------*
 
 
-      subroutine VPVt(VPV,debug)
+      subroutine VPVt(debug)
       implicit none
-      double complex VPV(3,4,2,3,3),Vmat(4,2,3,3) !debe de ir en commondelta     #
+C      double complex VPV(3,4,2,3,3),Vmat(4,2,3,3) !debe de ir en commondelta     #
       integer betha,i,j,P,II
       logical debug             ! If is .true. use debuguin part
-
-C     Import the values of Vmatrix(rotation matrix)
-      call RotMatrix(Vmat,debug)
+      include 'commondelta.f'   ! The out VPV, is inside commondelta
       
+*     Import the values of Vmatrix(rotation matrix)
+C      call RotMatrix(Vmat,debug) !Only use in construction, the call is outside 
+
       do 500, betha=1, 3
          do 100, P=1, 4
             do 200, II=1, 2
@@ -312,7 +312,7 @@ C     Import the values of Vmatrix(rotation matrix)
  500  continue
       
 
-C***********************************DEBUGGING***********************************C   
+************************************DEBUGGING************************************   
          
       if (debug) then
          open (unit=12,file='VPV.out',status='new')
@@ -338,25 +338,26 @@ C***********************************DEBUGGING***********************************
       return
       end                       !End subroutine VPVt
 
-C********************************************************************************C
+**********************************************************************************
 
 
 
 
       
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C                         Subrutine Delt(epsi,debug)                             C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C
+*--------------------------------------------------------------------------------* 
+*                                                                                * 
+*                         Subrutine Delt(epsi,debug)                             * 
+*                                                                                * 
+*--------------------------------------------------------------------------------*
  
-      subroutine Delt(Del,debug)
+      subroutine Delt(debug)
       implicit none
-      double complex epsi(4,2,3), Del(3,3,4,2), gcop(4,2,3)
+C      double complex epsi(4,2,3), Del(3,3,4,2), gcop(4,2,3) !commondelta
       integer P,II,B,a
       logical debug             ! If is .true. use debuguin part
-
-      call Epsilon(epsi,gcop,debug)
+      include 'commondelta.f'   !The out Del, is inside
+      
+C      call Epsilon(epsi,gcop,debug) !Only use in construction, the call is outside
 
       do 100, B=1, 3
          do 200, a=1, 3
@@ -370,12 +371,12 @@ C-------------------------------------------------------------------------------
       
       
  
-C***********************************DEBUGGING***********************************C  
+************************************DEBUGGING************************************  
          
       if (debug) then
          open (unit=13,file='Del.out',status='new')
-C     Format $A#:character, $: number of entries of the type
-C     #: number of spaces; I:integer; D: doubles; F
+*     Format $A#:character, $: number of entries of the type
+*     #: number of spaces; I:integer; D: doubles; F
  1000    format('',A4,4I2,A2,2E15.7) 
 
 
@@ -397,26 +398,26 @@ C     #: number of spaces; I:integer; D: doubles; F
       return
       end                       !End subroutine Delt
  
-C********************************************************************************C
+**********************************************************************************
 
       
       
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C                           Subrutine DBDG                                       C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C
+*--------------------------------------------------------------------------------* 
+*                                                                                * 
+*                           Subrutine DBDG                                       * 
+*                                                                                * 
+*--------------------------------------------------------------------------------*
  
-      subroutine DBDG(DB,DG,debug)
+      subroutine DBDG(debug)
       implicit none
-      double complex VPV(3,4,2,3,3), Del(3,3,4,2)
-      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3)
+C      double complex VPV(3,4,2,3,3), Del(3,3,4,2) !commndelta
+C      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3) !Commondelta
       integer P,II,B,a,i,j
       logical debug             ! If is .true. use debuguin part
+      include 'commondelta.f'   !The outs DB,DG, are inside od commondelta.f 
 
-
-      call VPVt(VPV,debug)
-      call Delt(Del,debug)
+C      call VPVt(VPV,debug)     !The call is made outside
+C      call Delt(Del,debug)    
 
 
       do 100, B=1, 3
@@ -451,7 +452,7 @@ C     1: Vectorial, 2: Axial
 
       
  
-C***********************************DEBUGGING***********************************C  
+************************************DEBUGGING************************************  
          
       if (debug) then
          open (unit=14,file='DBDG.out',status='new')
@@ -499,30 +500,30 @@ C***********************************DEBUGGING***********************************
       return
       end                       !End subroutine RotMatrix
  
-C********************************************************************************C
+**********************************************************************************
 
 
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C                           Subrutine ZSM                                        C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C
+*--------------------------------------------------------------------------------* 
+*                                                                                * 
+*                           Subrutine ZSM                                        * 
+*                                                                                * 
+*--------------------------------------------------------------------------------*
 
-      subroutine ZSM(epsi1,gcop1,debug)
-      dimension eps1_L(0:9),eps1_R(0:9), v(0:9),a(0:9)
+      subroutine ZSM(debug)
+      dimension eps1_L(0:9),eps1_R(0:9), v(0:9),a(0:9) !Auxiliary until cuple
       integer P,II,i,j,f      
-      double complex epsi1(4,2,3), gcop1(4,2,3)
+C      double complex epsi1(4,2,3), gcop1(4,2,3) !commondelta
       logical debug
-
-
+      include 'commondelta.f'   !epsi1,gcop1, are inside
+      
 *******************************************************************************
-C      Temporal
-******************************************************************************      
-      do 220 f = 0, 9
-         v(f) = (2*(f) -1)/2
-         a(f) =  f
- 220  continue
-******************************************************************************
+*                                     Temporal                                *
+*******************************************************************************     
+      do 220 f = 0, 9                                                         ! 
+         v(f) = (2*(f) -1)/2                                                  ! 
+         a(f) =  f                                                            ! 
+ 220  continue                                                                ! 
+*******************************************************************************
       
       do 197, j=0, 9
          eps1_L(j) = (v(j) + a(j))/2
@@ -635,8 +636,6 @@ C      Temporal
  200     continue
  100  continue
 
-
-
       do 111, P=1, 4
          do 211, II=1, 2
             do 311, i=1, 3
@@ -650,12 +649,6 @@ C      Temporal
  311        continue
  211     continue
  111  continue
-         
-
-
-
-
-
       
 C***********************************DEBUGGING***********************************C   
          
@@ -691,22 +684,23 @@ C*******************************************************************************
 
       
       
-C--------------------------------------------------------------------------------C 
-C                                                                                C 
-C   Subrutine DCDCM    C 
-C                                                                                C 
-C--------------------------------------------------------------------------------C
+*--------------------------------------------------------------------------------*
+*                                                                                *
+*                                  Subrutine DCDCM                               *
+*                                                                                *
+*--------------------------------------------------------------------------------*
  
-      subroutine DCDCM(w,y,DC,DCM,debug)
+      subroutine DCDCM(w,y,debug)
       implicit none
-      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3), deltaij(3,3) !Commonlib 
-      double complex DC(4,4,4,3,3,3,3), DCM(4,4,4,3,3,3,3),gcop1(4,2,3)
-      double complex epsi1(4,2,3),w,y,epsi(4,2,3),gcop(4,2,3)
+C     double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3) !Commondelta 
+C     double complex DC(4,4,4,3,3,3,3), DCM(4,4,4,3,3,3,3),gcop1(4,2,3)
+C     double complex epsi1(4,2,3),epsi(4,2,3),gcop(4,2,3)
+      double complex w,y,deltaij(3,3)
       integer P,II,C,i,j,k,l,a,B
       logical debug             ! If is .true. use debuguin part
- 
-C      include 'commondelta'
-C     II is a double indice, 1: LL(left, left), 2: LR, 3: RL, 4:  
+      include 'commondelta.f' !DC,DCM, are inside
+      
+*     II is a double indice, 1: LL(left, left), 2: LR, 3: RL, 4:  
    
       do 2200, i=1, 3
          do 2300, j=1, 3
@@ -719,8 +713,8 @@ C     II is a double indice, 1: LL(left, left), 2: LR, 3: RL, 4:
  2300    continue
  2200 continue
 
-      call DBDG(DB,DG,debug)    !Se llaman desde afuera para evitar calcularlos
-      call ZSM(epsi1,gcop1,debug)     !muchas veces
+*      call DBDG(DB,DG,debug)    !The call it is outside
+*      call ZSM(epsi1,gcop1,debug)    
 
 
       
@@ -869,7 +863,7 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  
       
  
-C***********************************DEBUGGING***********************************C  
+************************************DEBUGGING************************************  
          
       if (debug) then
          open (unit=15,file='DCDCM.out',status='new')
@@ -922,13 +916,10 @@ C***********************************DEBUGGING***********************************
  111     continue
          
 
-
-
-
       end if                    !End debugguing if
       close(unit=15)
       
       return
       end                       !End subroutine RotMatrix
  
-C********************************************************************************C
+**********************************************************************************
