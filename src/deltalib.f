@@ -263,6 +263,8 @@ C     Import the coupling values of Z' to fermions
  500        continue
  400     continue
 
+         write(11,*) "-------------------------------------------"
+         
          do 410, P=1, 4
             do 510, II=1, 2
                do 610, i=1, 3
@@ -330,6 +332,23 @@ C      call RotMatrix(Vmat,debug) !Only use in construction, the call is outside
  700           continue
  600        continue
  1000    continue
+
+         
+ 2001    format('',A5,4I2,A2,2E15.7)
+
+         write(12,*) "-----------------------------------------"
+         
+            do 5001, p=1, 4
+               do 6001, II=1, 2
+                  do 7001, i=1, 3
+                     do 8001, j=1, 3
+                        write(12,2001) "Vmat(",P,II,i,j,")=",
+     .                       Vmat(P,II,i,j)            
+ 8001                continue
+ 7001             continue
+ 6001          continue
+ 5001       continue
+
          
       end if                    !End debugguing if
       
@@ -353,7 +372,7 @@ C      call RotMatrix(Vmat,debug) !Only use in construction, the call is outside
       subroutine Delt(debug)
       implicit none
 C      double complex epsi(4,2,3), Del(3,3,4,2), gcop(4,2,3) !commondelta
-      integer P,II,B,a
+      integer P,II,B,a,i
       logical debug             ! If is .true. use debuguin part
       include 'commondelta.f'   !The out Del, is inside
       
@@ -378,8 +397,6 @@ C      call Epsilon(epsi,gcop,debug) !Only use in construction, the call is outs
 *     Format $A#:character, $: number of entries of the type
 *     #: number of spaces; I:integer; D: doubles; F
  1000    format('',A4,4I2,A2,2E15.7) 
-
-
          
          do 500, B=1, 3
             do 600, a=1, 3
@@ -391,8 +408,31 @@ C      call Epsilon(epsi,gcop,debug) !Only use in construction, the call is outs
  600        continue
  500     continue
                   
-      end if                    !End debugguing if
+         write(13,*) "-------------------------------------------"
+ 
+ 2001    format('',A5,3I2,A2,2E15.7)
 
+         do 4001, P=1, 4
+            do 5001, II=1, 2
+               do 6001, i=1, 3
+                  write(13,2001) "epsi(",P,II,i,")=",epsi(P,II,i)  
+ 6001           continue
+ 5001        continue
+ 4001     continue
+
+         write(11,*) "-------------------------------------------"
+         
+         do 4101, P=1, 4
+            do 5101, II=1, 2
+               do 6101, i=1, 3
+                  write(13,2001) "gcop(",P,II,i,")=",gcop(P,II,i)  
+ 6101           continue
+ 5101        continue
+ 4101     continue
+
+
+      end if                    !End debugguing if
+      
       close(unit=13)
       
       return
@@ -412,7 +452,7 @@ C      call Epsilon(epsi,gcop,debug) !Only use in construction, the call is outs
       implicit none
 C      double complex VPV(3,4,2,3,3), Del(3,3,4,2) !commndelta
 C      double complex DB(3,3,4,2,3,3), DG(3,3,4,2,3,3) !Commondelta
-      integer P,II,B,a,i,j
+      integer P,II,B,a,i,j,betha
       logical debug             ! If is .true. use debuguin part
       include 'commondelta.f'   !The outs DB,DG, are inside od commondelta.f 
 
@@ -459,8 +499,6 @@ C     1: Vectorial, 2: Axial
 
  2000    format('',A3,6I2,A2,2E15.7)
          
-
-         
       do 101, B=1, 3
          do 201, a=1, 3
             do 301, P=1, 4
@@ -493,6 +531,43 @@ C     1: Vectorial, 2: Axial
  211     continue
  111  continue
 
+      write(11,*) "-------------------------------------------"
+
+      
+ 2001 format('',A4,5I2,A2,2E15.7)
+         
+         do 1001, betha=1, 3
+            do 6001, P=1, 4
+               do 7001, II=1, 2
+                  do 8001, i=1, 3
+                     do 9001, j=1, 3
+                        write(14,2001) "VPV(",betha,P,II,i,j,")=",
+     .                       VPV(betha,P,II,i,j)
+ 9001                continue
+ 8001             continue
+ 7001          continue
+ 6001       continue
+ 1001    continue
+
+         write(13,*) "-------------------------------------------"
+
+
+ 1000    format('',A4,4I2,A2,2E15.7) 
+         
+         do 5100, B=1, 3
+            do 6100, a=1, 3
+               do 7100, P=1, 4
+                  do 8100, II=1, 2
+                     write(14,1000) "Del(",B,a,P,II,")=",Del(B,a,P,II)
+ 8100             continue
+ 7100          continue
+ 6100       continue
+ 5100    continue
+                  
+
+
+
+         
       
       end if                    !End debugguing if
       close(unit=14)
@@ -914,8 +989,66 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  311           continue
  211        continue
  111     continue
-         
 
+         write(15,*) "-------------------------------------------"
+         
+ 2002    format('',A6,3I2,A2,2E15.7)
+         
+         do 2400, P=1, 4
+            do 2500, II=1, 2
+               do 2600, i=1, 3
+                  write(15,2002) "epsi1(",P,II,i,")=",epsi1(P,II,i)  
+ 2600          continue
+ 2500       continue
+ 2400    continue
+
+
+         do 2410, P=1, 4
+            do 2510, II=1, 2
+               do 2610, i=1, 3
+                  write(15,2002) "gcop1(",P,II,i,")=",gcop1(P,II,i)  
+ 2610          continue
+ 2510       continue
+ 2410    continue
+
+
+         write(15,*) "-------------------------------------------"
+
+ 2003    format('',A3,6I2,A2,2E15.7)
+         
+      do 3101, B=1, 3
+         do 3201, a=1, 3
+            do 3301, P=1, 4
+               do 3401, II=1, 2
+                  do 3501, i=1, 3
+                     do 3601, j=1, 3
+                        write(15,2003) "DB(",B,a,P,II,i,j,")=",
+     .                       DB(B,a,P,II,i,j)
+ 3601                continue
+ 3501             continue
+ 3401          continue
+ 3301       continue
+ 3201    continue
+ 3101 continue
+
+      write(15,*)"-------------------------------------------"
+      
+      do 3111, B=1, 3
+         do 3211, a=1, 3
+            do 3311, P=1, 4
+               do 3411, II=1, 2
+                  do 3511, i=1, 3
+                     do 3611, j=1, 3
+                        write(15,2003) "DG(",B,a,P,II,i,j,")=",
+     .                       DG(B,a,P,II,i,j)
+ 3611                continue
+ 3511             continue
+ 3411          continue
+ 3311       continue
+ 3211    continue
+ 3111 continue
+
+         
       end if                    !End debugguing if
       close(unit=15)
       
