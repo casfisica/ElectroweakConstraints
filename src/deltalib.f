@@ -945,6 +945,12 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  
  2000    format('',A3,7I2,A2,2E15.7) 
  2001    format('',A4,7I2,A2,2E15.7)
+ 2020    format('',2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2,
+     .        A1,2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2,
+     .        A1,2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2,
+     .        A1,2E10.2,A1,2E10.2,A1,2E10.2,A1,2E10.2)
+
+         write(15,*)"------------------DC-----------------------"
          
          do 101, B=1, 3
             do 201, a=1, 3
@@ -955,8 +961,10 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
                            do 701, C=1, 4
                               do 901, k=1, 3
                                  do 1001, l=1, 3
-                                    write(15,2000) "DC(",P,II,C,i,j,k,l,
-     .                                   ")=", DC(P,II,C,i,j,k,l)
+                                    if (DC(P,II,C,i,j,k,l).ne.0d0) then
+                                       write(15,2000) "DC(",P,II,C,i,j,
+     .                                      k,l,")=", DC(P,II,C,i,j,k,l)
+                                    endif
  1001                            continue
  901                          continue
  701                       continue
@@ -967,7 +975,7 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  201        continue
  101     continue
 
-         write(15,*)"-------------------------------------------"
+         write(15,*)"--------------------DCM---------------------"
          
          do 111, B=1, 3
             do 211, a=1, 3
@@ -978,8 +986,11 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
                            do 711, C=1, 4
                               do 911, k=1, 3
                                  do 1101, l=1, 3
-                                    write(15,2001) "DCM(",P,II,C,i,j,k,l
-     .                                   ,")=", DCM(P,II,C,i,j,k,l)
+                                    if (DCM(P,II,C,i,j,k,l).ne.0d0) then 
+                                       write(15,2001) "DCM(",P,II,C,i,j,
+     .                                      k,l,")=",
+     .                                      DCM(P,II,C,i,j,k,l)
+                                    endif
  1101                            continue
  911                          continue
  711                       continue
@@ -990,14 +1001,16 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  211        continue
  111     continue
 
-         write(15,*) "-------------------------------------------"
+         write(15,*) "------------------epsi1-----------------------"
          
  2002    format('',A6,3I2,A2,2E15.7)
          
          do 2400, P=1, 4
             do 2500, II=1, 2
                do 2600, i=1, 3
-                  write(15,2002) "epsi1(",P,II,i,")=",epsi1(P,II,i)  
+                  if (epsi1(P,II,i).ne.0d0) then
+                     write(15,2002) "epsi1(",P,II,i,")=",epsi1(P,II,i)
+                  endif
  2600          continue
  2500       continue
  2400    continue
@@ -1006,13 +1019,15 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
          do 2410, P=1, 4
             do 2510, II=1, 2
                do 2610, i=1, 3
-                  write(15,2002) "gcop1(",P,II,i,")=",gcop1(P,II,i)  
+                  if (gcop1(P,II,i).ne.0d0) then
+                     write(15,2002) "gcop1(",P,II,i,")=",gcop1(P,II,i)
+                  endif
  2610          continue
  2510       continue
  2410    continue
 
 
-         write(15,*) "-------------------------------------------"
+         write(15,*) "-------------------DB------------------------"
 
  2003    format('',A3,6I2,A2,2E15.7)
          
@@ -1022,8 +1037,10 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
                do 3401, II=1, 2
                   do 3501, i=1, 3
                      do 3601, j=1, 3
-                        write(15,2003) "DB(",B,a,P,II,i,j,")=",
-     .                       DB(B,a,P,II,i,j)
+                        if (DB(B,a,P,II,i,j).ne.0d0) then
+                           write(15,2003) "DB(",B,a,P,II,i,j,")=",
+     .                          DB(B,a,P,II,i,j)
+                     endif
  3601                continue
  3501             continue
  3401          continue
@@ -1031,7 +1048,7 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  3201    continue
  3101 continue
 
-      write(15,*)"-------------------------------------------"
+      write(15,*)"------------------DG-------------------------"
       
       do 3111, B=1, 3
          do 3211, a=1, 3
@@ -1039,8 +1056,10 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
                do 3411, II=1, 2
                   do 3511, i=1, 3
                      do 3611, j=1, 3
-                        write(15,2003) "DG(",B,a,P,II,i,j,")=",
-     .                       DG(B,a,P,II,i,j)
+                        if (DG(B,a,P,II,i,j).ne.0d0) then
+                           write(15,2003) "DG(",B,a,P,II,i,j,")=",
+     .                          DG(B,a,P,II,i,j)
+                        endif
  3611                continue
  3511             continue
  3411          continue
@@ -1048,7 +1067,33 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
  3211    continue
  3111 continue
 
+
+      write(15,*)"------------------epsi-------------------------"
+      
+
+ 2222 format('',A5,3I2,A2,2E15.7)
+
+         do 4300, P=1, 4
+            do 5300, II=1, 2
+               do 6300, i=1, 3
+                  if (epsi(P,II,i).ne.0d0) then
+                     write(15,2222) "epsi(",P,II,i,")=",epsi(P,II,i)
+                  endif
+ 6300          continue
+ 5300       continue
+ 4300    continue
+
+         write(15,*) "-------------gcop---------------------------"
          
+         do 4109, P=1, 4
+            do 5109, II=1, 2
+               do 6109, i=1, 3
+                  if (gcop(P,II,i).ne.0d0) then
+                     write(15,2222) "gcop(",P,II,i,")=",gcop(P,II,i)
+                  endif
+ 6109          continue
+ 5109       continue
+ 4109    continue
       end if                    !End debugguing if
       close(unit=15)
       
