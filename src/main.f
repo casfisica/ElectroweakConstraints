@@ -2,7 +2,8 @@
       implicit none
       logical debug, flinit
       character(len=32) arg
-      integer d, f, w,y
+      integer d,f
+      double complex w,y
 
       include 'common.f'
       include 'commondelta.f'
@@ -23,7 +24,8 @@ C*******************************************************************************
       flinit=.true.
 
 
-
+      w=20d0
+      y=50d0
       
 C      call sin2thetaw(flinit)
 C      write(*,*) arg     
@@ -33,7 +35,7 @@ C      write(*,*) arg
       call Delt(debug)
       call DBDG(debug)
       call ZSM(debug)
-      call DCDCM(21,200,debug)
+      call DCDCM(w,y,debug)
       
       stop
       end
