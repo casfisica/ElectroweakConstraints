@@ -238,10 +238,10 @@ C     Import the coupling values of Z' to fermions
             do 2500, II=1, 2    !Para el caso de g 1:Axial, 2:Vectorial
                do 2600, i=1, 3
                   if (II.eq.1) then
-                     gcop(P,II,i)= epsi(P,1,i)+
+                     gcop(P,II,i)= epsi(P,1,i)-
      .                    epsi(P,2,i)
                   else if (II.eq.2) then
-                     gcop(P,II,i)= epsi(P,1,i)-
+                     gcop(P,II,i)= epsi(P,1,i)+
      .                    epsi(P,2,i)
                   else
                   end if
@@ -816,73 +816,74 @@ C     double complex epsi1(4,2,3),epsi(4,2,3),gcop(4,2,3)
 *      call DBDG(DB,DG,debug)    !The call it is outside
 *      call ZSM(epsi1,gcop1,debug)    
 
-
+      B=3
+      a=1
       
-      do 100, B=1, 3
-         do 200, a=1, 3
-            do 300, P=1, 4
-               do 400, II=1, 4
-                  do 500, i=1, 3
-                     do 600, j=1, 3
-                        do 700, C=1, 4
-                           do 900, k=1, 3
-                              do 1000, l=1, 3
-                                 if (II.eq.1) then
-                                    DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
-     .                                   epsi1(P,1,a)*DB(B,a,C,1,k,l)+
-     .                                   deltaij(k,l)*
-     .                                   epsi1(C,1,a)*DB(B,a,P,1,i,j))
-     .                                   +y*(deltaij(i,j)*epsi(P,1,a)*
-     .                                   DB(B,a,C,1,k,l)+
-     .                                   deltaij(k,l)*epsi(C,1,a)*
-     .                                   DB(B,a,P,1,i,j)+
-     .                                   DB(B,a,P,1,i,j)*
-     .                                   DB(B,a,C,1,k,l))
-                                 else if (II.eq.2) then
-                                    DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
-     .                                   epsi1(P,1,a)*DB(B,a,C,2,k,l)+
-     .                                   deltaij(k,l)*
-     .                                   epsi1(C,2,a)*DB(B,a,P,1,i,j))
-     .                                   +y*(deltaij(i,j)*epsi(P,1,a)*
-     .                                   DB(B,a,C,2,k,l)+
-     .                                   deltaij(k,l)*epsi(C,2,a)*
-     .                                   DB(B,a,P,1,i,j)+
-     .                                   DB(B,a,P,1,i,j)*
-     .                                   DB(B,a,C,2,k,l))
-                                 else if (II.eq.3) then
-                                    DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
-     .                                   epsi1(P,2,a)*DB(B,a,C,1,k,l)+
-     .                                   deltaij(k,l)*
-     .                                   epsi1(C,1,a)*DB(B,a,P,2,i,j))
-     .                                   +y*(deltaij(i,j)*epsi(P,2,a)*
-     .                                   DB(B,a,C,1,k,l)+
-     .                                   deltaij(k,l)*epsi(C,1,a)*
-     .                                   DB(B,a,P,2,i,j)+
-     .                                   DB(B,a,P,2,i,j)*
-     .                                   DB(B,a,C,1,k,l))
-                                 else if (II.eq.4) then
-                                    DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
-     .                                   epsi1(P,2,a)*DB(B,a,C,2,k,l)+
-     .                                   deltaij(k,l)*
-     .                                   epsi1(C,2,a)*DB(B,a,P,2,i,j))
-     .                                   +y*(deltaij(i,j)*epsi(P,2,a)*
-     .                                   DB(B,a,C,2,k,l)+
-     .                                   deltaij(k,l)*epsi(C,2,a)*
-     .                                   DB(B,a,P,2,i,j)+
-     .                                   DB(B,a,P,2,i,j)*
-     .                                   DB(B,a,C,2,k,l)) 
-                                 else
-                                    STOP 'errEps'
-                                 end if
- 1000                         continue
- 900                       continue
- 700                    continue
- 600                 continue
- 500              continue
- 400           continue
- 300        continue
- 200     continue
- 100  continue
+c      do 100, B=1, 3
+c         do 200, a=1, 3
+      do 300, P=1, 4
+         do 400, II=1, 4
+            do 500, i=1, 3
+               do 600, j=1, 3
+                  do 700, C=1, 4
+                     do 900, k=1, 3
+                        do 1000, l=1, 3
+                           if (II.eq.1) then
+                              DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
+     .                             epsi1(P,1,a)*DB(B,a,C,1,k,l)+
+     .                             deltaij(k,l)*
+     .                             epsi1(C,1,a)*DB(B,a,P,1,i,j))
+     .                             +y*(deltaij(i,j)*epsi(P,1,a)*
+     .                             DB(B,a,C,1,k,l)+
+     .                             deltaij(k,l)*epsi(C,1,a)*
+     .                             DB(B,a,P,1,i,j)+
+     .                             DB(B,a,P,1,i,j)*
+     .                             DB(B,a,C,1,k,l))
+                           else if (II.eq.2) then
+                              DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
+     .                             epsi1(P,1,a)*DB(B,a,C,2,k,l)+
+     .                             deltaij(k,l)*
+     .                             epsi1(C,2,a)*DB(B,a,P,1,i,j))
+     .                             +y*(deltaij(i,j)*epsi(P,1,a)*
+     .                             DB(B,a,C,2,k,l)+
+     .                             deltaij(k,l)*epsi(C,2,a)*
+     .                             DB(B,a,P,1,i,j)+
+     .                             DB(B,a,P,1,i,j)*
+     .                             DB(B,a,C,2,k,l))
+                           else if (II.eq.3) then
+                              DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
+     .                             epsi1(P,2,a)*DB(B,a,C,1,k,l)+
+     .                             deltaij(k,l)*
+     .                             epsi1(C,1,a)*DB(B,a,P,2,i,j))
+     .                             +y*(deltaij(i,j)*epsi(P,2,a)*
+     .                             DB(B,a,C,1,k,l)+
+     .                             deltaij(k,l)*epsi(C,1,a)*
+     .                             DB(B,a,P,2,i,j)+
+     .                             DB(B,a,P,2,i,j)*
+     .                             DB(B,a,C,1,k,l))
+                           else if (II.eq.4) then
+                              DC(P,II,C,i,j,k,l)=w*(deltaij(i,j)*
+     .                             epsi1(P,2,a)*DB(B,a,C,2,k,l)+
+     .                             deltaij(k,l)*
+     .                             epsi1(C,2,a)*DB(B,a,P,2,i,j))
+     .                             +y*(deltaij(i,j)*epsi(P,2,a)*
+     .                             DB(B,a,C,2,k,l)+
+     .                             deltaij(k,l)*epsi(C,2,a)*
+     .                             DB(B,a,P,2,i,j)+
+     .                             DB(B,a,P,2,i,j)*
+     .                             DB(B,a,C,2,k,l)) 
+                           else
+                              STOP 'errEps'
+                           end if
+ 1000                   continue
+ 900                 continue
+ 700              continue
+ 600           continue
+ 500        continue
+ 400     continue
+ 300  continue
+c 200  continue
+c 100  continue
 
 C     de II indice is a double one, next it is the mining
 C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
@@ -924,6 +925,9 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
       if (debug) then
          open (unit=15,file='DCDCM.out',status='new')
          
+         write(15,*)"w=",w
+         write(15,*)"y=",y
+         
  2020    format('',A8,2I2,A2,2E15.7)
          
          do 2290, i=1, 3
@@ -935,9 +939,11 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
          
  2000    format('',A3,7I2,A2,2E15.7) 
  2001    format('',A4,7I2,A2,2E15.7)
- 
+
          write(15,*)"------------------DC-----------------------"
+
          
+        
          do 101, B=1, 3
             do 201, a=1, 3
                do 301, P=1, 4
