@@ -899,12 +899,56 @@ C     II=1,2,3,4 1: Vectorial,Vectorial; 2: Vectorial,Axial; 3: A,V; 4: A,A
                               do 1100, l=1, 3
                                  if (II.eq.1) then
                                     DCM(P,II,C,i,j,k,l)=0d0
+                                    DCM(P,II,C,i,j,k,l)=(1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,1,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,1,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,1,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,1,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*DG(a,B,P,1,i,j)*
+     .                                   DG(a,B,C,1,k,l))
                                  else if (II.eq.2) then
                                     DCM(P,II,C,i,j,k,l)=0d0
+                                    DCM(P,II,C,i,j,k,l)=(-1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,1,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,2,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,1,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,2,a)*
+     .                                   DG(a,B,P,1,i,j)+
+     .                                   y*DG(a,B,P,1,i,j)*
+     .                                   DG(a,B,C,2,k,l))
                                  else if (II.eq.3) then
                                     DCM(P,II,C,i,j,k,l)=0d0
+                                    DCM(P,II,C,i,j,k,l)= (-1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,2,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,1,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,2,a)*
+     .                                   DG(a,B,C,1,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,1,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*DG(a,B,P,2,i,j)*
+     .                                   DG(a,B,C,1,k,l))
                                  else if (II.eq.4) then
                                     DCM(P,II,C,i,j,k,l)=0d0
+                                    DCM(P,II,C,i,j,k,l)= (1d0/4d0)*
+     .                                   (w*deltaij(i,j)*gcop1(P,2,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   w*deltaij(k,l)*gcop1(C,2,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*deltaij(i,j)*gcop(P,2,a)*
+     .                                   DG(a,B,C,2,k,l)+
+     .                                   y*deltaij(k,l)*gcop(C,2,a)*
+     .                                   DG(a,B,P,2,i,j)+
+     .                                   y*DG(a,B,P,2,i,j)*
+     .                                   DG(a,B,C,2,k,l))
                                  else
                                     STOP 'errEps'
                                  end if
